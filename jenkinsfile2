@@ -1,0 +1,46 @@
+pipeline{
+
+	agent {label 'server'}
+
+	environment {
+		DOCKERHUB_CREDENTIALS=credentials('Docker-credentials')
+	}
+
+	stages {
+	    
+ 		stage('Build') {
+
+ 			steps {
+ 				 sh 'docker build -t systemctl123456/build_java:latest /var/lib/jenkins/workspace/kubernetes_pipeline/gs-maven/complete/target'
+			     sh 'docker tag systemctl123456/build_java:latest systemctl123456/build_java:stuff '
+			    
+ 			}
+ 		}
+		stage('Login') {
+
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+			}
+		}
+// 		stage('Tag') {
+
+// 			steps {
+// 				sh 'docker tag systemctl123456/build_java:latest systemctl/build_java:stuff '
+// 			}
+// 		}
+
+		stage('Push') {
+
+			steps {
+				sh 'docker push systemctl123456/build_java:stuff'
+			}
+		}
+	}
+
+	post {
+		always {
+			sh 'docker logout'
+		}
+	}
+
+}
