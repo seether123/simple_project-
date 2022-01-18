@@ -1,0 +1,24 @@
+kubectl create secret docker-registry regcred --docker-username=<your username > --docker-password=<your password> --docker-email=<your email> -n docker-name
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-deployment
+  labels:
+    app: java
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java
+  template:
+    metadata:
+      labels:
+        app: java
+    spec:
+      containers:
+      - name: java-image
+        image: systemctl123456/build_java:stuff
+      imagePullSecrets:
+      - name: regcred
+
+
